@@ -31,6 +31,67 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
 
+      // ! database collections
+      const  userCollections = client.db('go-marathon-db').collection('Users')
+
+
+
+
+//      !user related api
+      //  creat new user
+app.post('/api/users', async(req,res) => {
+           try {
+              const newUser = req.body;
+              const email = newUser.email;
+
+              console.log(email);
+              
+
+                  // varify user 
+                    if(!email){
+                         return res.status(400).json({success : false , message : 'email is required'})
+                    }
+
+                  //     if user already exist in database 
+                    const existingUser = await userCollections.findOne({email});
+
+                    if(existingUser){
+                         return res.status(200).json({success : true , message : 'user already exist'})
+                    }
+
+              const result = await userCollections.insertOne(newUser);
+              res.status(201).json({
+                  success : true,
+                  message : 'user created succesfully',
+                  data: result
+              })
+           } catch (error) {
+              res.status(500).json({
+                   success : false,
+                   message : 'Faild to creat user',
+                   error : error.message
+              })
+           }
+})
+
+            // get all users
+
+app.get('/api/users', async (req, res) => {
+      try {
+        const users = await userCollections.find().toArray();
+        res.status(200).json({
+          success: true,
+          data: users,
+        });
+      } catch (error) {
+        res.status(500).json({
+          success: false,
+          message: 'Failed to fetch users',
+          error: error.message,
+        });
+      }
+    });
+
 
 
 
