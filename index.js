@@ -33,6 +33,8 @@ async function run() {
 
       // ! database collections
       const  userCollections = client.db('go-marathon-db').collection('Users')
+      const  marathonCollections = client.db('go-marathon-db').collection('Marathons')
+      const  registerdMarathonCollections = client.db('go-marathon-db').collection('Registerd-Marathons')
 
 
 
@@ -60,11 +62,7 @@ app.post('/api/users', async(req,res) => {
                     }
 
               const result = await userCollections.insertOne(newUser);
-              res.status(201).json({
-                  success : true,
-                  message : 'user created succesfully',
-                  data: result
-              })
+                       res.send(result)
            } catch (error) {
               res.status(500).json({
                    success : false,
@@ -78,11 +76,8 @@ app.post('/api/users', async(req,res) => {
 
 app.get('/api/users', async (req, res) => {
       try {
-        const users = await userCollections.find().toArray();
-        res.status(200).json({
-          success: true,
-          data: users,
-        });
+        const result = await userCollections.find().toArray();
+          res.send(result)
       } catch (error) {
         res.status(500).json({
           success: false,
@@ -91,6 +86,32 @@ app.get('/api/users', async (req, res) => {
         });
       }
     });
+
+// ! marathon related api
+    app.post('/api/marathon' , async(req,res) => {
+             const  marathonData = req.body;
+
+             const result = await marathonCollections.insertOne(marathonData);
+             res.send(result)
+    })
+
+    app.get('/api/marathon', async(req,res) => {
+           const result = await marathonCollections.find().toArray();
+           res.send(result);
+    })
+
+//     ! registerd Marathon Collections related api
+
+   app.post('/api/registerd-marathon', async(req,res) => {
+        const data = req.body;
+        const result = await registerdMarathonCollections.insertOne(data);
+        res.send(result)
+   })
+
+   app.get('/api/registerd-marathon', async(req,res) => {
+         const result = await registerdMarathonCollections.find().toArray();
+         res.send(result)
+   })
 
 
 
