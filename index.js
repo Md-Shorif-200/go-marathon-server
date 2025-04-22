@@ -3,7 +3,7 @@ const cors = require('cors');
 const app = express();
 const port =  process.env.PORT || 5000;
 require('dotenv').config()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 
 
 // middleware
@@ -46,7 +46,7 @@ app.post('/api/users', async(req,res) => {
               const newUser = req.body;
               const email = newUser.email;
 
-              console.log(email);
+            
               
 
                   // varify user 
@@ -98,6 +98,42 @@ app.get('/api/users', async (req, res) => {
     app.get('/api/marathon', async(req,res) => {
            const result = await marathonCollections.find().toArray();
            res.send(result);
+    })
+
+    // delete single marathon
+
+    app.delete('/api/marathon/:id', async(req,res) => {
+        const id = req.params.id;
+        const query = {_id : new ObjectId(id)};
+
+        const result = await marathonCollections.deleteOne(query);
+        res.send(result)
+    })
+
+    // update marathon data
+    app.patch('/api/marathon/:email', async (req,res) => {
+
+      const email = req.params.email;
+      const updatedMarathonData = req.body;
+
+      const filter = {email : email};
+      const updatedDoc = {
+        $set : {
+          marathonTitle :  updatedMarathonData.marathonTitle,
+          registrationStart : updatedMarathonData.registrationStart,
+          registrationEnd : updatedMarathonData.registrationEnd,
+          marathonStart : updatedMarathonData.marathonStart,
+          location : updatedMarathonData.location,
+          runningDistance : updatedMarathonData.runningDistance,
+          description : updatedMarathonData.description,
+          marathonImage : updatedMarathonData.marathonImage
+        }
+      }
+
+      const result = await marathonCollections.updateOne(filter,updatedDoc);
+      res.send(result)
+      
+        
     })
 
 //     ! registerd Marathon Collections related api
