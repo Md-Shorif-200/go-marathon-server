@@ -87,6 +87,24 @@ app.get('/api/users', async (req, res) => {
       }
     });
 
+    // update user profile
+    app.patch('/api/users/profile-update/:email',async(req,res) => {
+        const  profileData = req.body;
+        const email = req.params.email;
+        
+        const query = {email : email};
+        const updatedDoc = {
+          $set : {
+               phoneNumber : profileData.phoneNumber,
+               address : profileData.address,
+               profilePicture : profileData.photo
+          }
+        }
+
+        const result = await userCollections.updateOne(query,updatedDoc)
+         res.send(result)
+    })
+
 // ! marathon related api
     app.post('/api/marathon' , async(req,res) => {
              const  marathonData = req.body;
